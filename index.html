@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学納金(在学生)</title>
+
+<style>
+body{
+    margin:0;
+    font-family:"Yu Gothic","Meiryo",sans-serif;
+    background:#f2f5f9;
+    color:#222;
+}
+
+.container{
+    max-width:900px;
+    margin:0 auto;
+    padding:45px 20px;
+}
+
+.header{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.header h1{
+    font-size:36px;
+    margin:0;
+    padding:18px 0;
+    border-top:4px solid #003B8E;
+    border-bottom:4px solid #003B8E;
+}
+
+/* メニュー全体のラッパー（PCでは縦1列、スマホでグリッドに切り替え） */
+.portal-menu{
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+    margin-bottom:70px;
+}
+
+/* グループごとのデフォルト設定（PC時は縦に並べる） */
+.main-actions, .sub-actions {
+    display:flex;
+    flex-direction:column;
+    gap:22px;
+}
+
+.portal-card{
+    display:flex;
+    align-items:center;
+    gap:20px;
+    padding:28px 30px;
+    background:#fff;
+    border-radius:16px;
+    border-left:8px solid #003B8E;
+    text-decoration:none;
+    color:#222;
+    box-shadow:0 5px 14px rgba(0,0,0,.08);
+    transition:transform .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+.portal-card:hover{
+    transform:translateY(-5px) scale(1.02);
+    box-shadow:0 14px 28px rgba(0,0,0,.16);
+    background:linear-gradient(90deg,#fff,#f4f9ff);
+}
+
+.portal-card:active{
+    transform:translateY(-1px) scale(.99);
+}
+
+.icon{
+    font-size:60px;
+    width:80px;
+    text-align:center;
+    flex-shrink:0;
+    transition:transform .18s ease;
+}
+
+.portal-card:hover .icon{
+    transform:scale(1.15);
+}
+
+.text{
+    flex:1;
+}
+
+.title{
+    font-size:24px;
+    font-weight:800;
+    letter-spacing:0.5px;
+}
+
+.caption{
+    font-size:15px;
+    color:#555;
+}
+
+.arrow{
+    font-size:30px;
+    color:#003B8E;
+}
+
+.pay{ border-left-color:#1f8f4d; }
+.fee{ border-left-color:#0066cc; }
+.faq{ border-left-color:#e0a800; }
+.form{ border-left-color:#7b4fc9; }
+
+.footer-logo{
+    margin-top:20px;
+    padding-top:35px;
+    border-top:2px solid #d8dee8;
+    text-align:center;
+}
+
+.footer-logo img{
+    max-width:260px;
+    width:70%;
+    height:auto;
+}
+
+/* 📱 スマートフォン環境（768px以下）用の今風スタイル */
+@media(max-width:768px){
+    .header h1{
+        font-size:28px;
+    }
+
+    /* 全体の隙間をスマホ向けに微調整 */
+    .portal-menu {
+        gap: 16px;
+    }
+
+    /* 主要アクション（支払う・確認する）を横並び2列に */
+    .main-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+    }
+
+    /* 横並びカード専用スタイル（アイコンを上、文字を下に配置して正方形っぽく見せる） */
+    .main-actions .portal-card {
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        padding: 24px 12px;
+        gap: 10px;
+        /* 左ボーダーの代わりに、上部ボーダーにしてカードの個性を維持 */
+        border-left: none;
+        border-top: 6px solid #003B8E;
+    }
+    .main-actions .pay { border-top-color: #1f8f4d; }
+    .main-actions .fee { border-top-color: #0066cc; }
+
+    /* 横並びカード内の各要素の調整 */
+    .main-actions .icon {
+        font-size: 42px;
+        width: auto;
+    }
+    .main-actions .title {
+        font-size: 16px;
+        white-space: normal; /* スマホで文字が収まるように自動改行を許可 */
+        line-height: 1.3;
+    }
+    .main-actions .caption,
+    .main-actions .arrow {
+        display: none; /* 限られたスペースを活かすため説明文と矢印は非表示に */
+    }
+
+    /* サポートアクション（質問・手続き）は1列のスマートなリストに */
+    .sub-actions {
+        gap: 10px;
+    }
+    .sub-actions .portal-card {
+        padding: 16px 20px;
+        gap: 14px;
+        border-left-width: 6px;
+    }
+    .sub-actions .icon {
+        font-size: 26px;
+        width: 32px;
+    }
+    .sub-actions .title {
+        font-size: 16px;
+    }
+    .sub-actions .caption {
+        display: none; /* すっきり感を出すためにスマホでは説明文を非表示に */
+    }
+    .sub-actions .arrow {
+        font-size: 22px;
+    }
+
+    .footer-logo img{
+        max-width:210px;
+        width:75%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🎓 学納金（在学生）</h1>
+    </div>
+
+    <div class="portal-menu">
+
+        <div class="main-actions">
+            <a class="portal-card pay"
+               href="https://eiyo-payer.postaedufee.jp/login/PayerLogin"
+               target="_blank"
+               rel="noopener">
+                <div class="icon">💳</div>
+                <div class="text">
+                    <div class="title">学納金を支払う</div>
+                    <div class="caption">学納金のお支払いサイトへ移動します</div>
+                </div>
+                <div class="arrow">›</div>
+            </a>
+
+            <a class="portal-card fee"
+               href="学納金等一覧.html"
+               target="_blank"
+               rel="noopener">
+                <div class="icon">📄</div>
+                <div class="text">
+                    <div class="title">金額を確認する</div>
+                    <div class="caption">学納金等一覧表を確認できます</div>
+                </div>
+                <div class="arrow">›</div>
+            </a>
+        </div>
+
+        <div class="sub-actions">
+            <a class="portal-card faq"
+               href="faq.html"
+               target="_blank"
+               rel="noopener">
+                <div class="icon">❓</div>
+                <div class="text">
+                    <div class="title">質問を見る</div>
+                    <div class="caption">よくある質問をご覧いただけます</div>
+                </div>
+                <div class="arrow">›</div>
+            </a>
+
+            <a class="portal-card form"
+               href="forms.html"
+               target="_blank"
+               rel="noopener">
+                <div class="icon">📝</div>
+                <div class="text">
+                    <div class="title">延納・分納の手続き</div>
+                    <div class="caption">延納願・分納願をダウンロードできます</div>
+                </div>
+                <div class="arrow">›</div>
+            </a>
+        </div>
+
+    </div>
+
+    <div class="footer-logo">
+        <img src="logo.svg">
+    </div>
+
+</div>
+
+</body>
+</html>
