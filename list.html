@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>2026年度 学納金等一覧</title>
+
+  <style>
+body{
+    margin:0;
+    font-family:"Yu Gothic","Meiryo",sans-serif;
+    background:#f2f5f9;
+    color:#222;
+    line-height:1.6;
+}
+
+.container{
+    max-width:900px;
+    margin:0 auto;
+    padding:45px 20px;
+}
+
+.back-link:hover{
+    text-decoration:underline;
+}
+
+header{
+    text-align:center;
+    margin-bottom:34px;
+}
+
+h1{
+    font-size:34px;
+    margin:0;
+    padding:18px 0;
+    border-top:4px solid #003B8E;
+    border-bottom:4px solid #003B8E;
+}
+
+.hint{
+    color:#444;
+    font-size:16px;
+    margin-top:18px;
+}
+
+.controls{
+    display:grid;
+    gap:14px;
+    margin:28px 0 34px;
+    background:#fff;
+    padding:22px;
+    border-radius:16px;
+    box-shadow:0 5px 14px rgba(0,0,0,.08);
+}
+
+select{
+    width:100%;
+    padding:13px;
+    font-size:16px;
+    border:1px solid #ccc;
+    border-radius:10px;
+    background:#fff;
+}
+
+.card{
+    background:#fff;
+    border-radius:16px;
+    padding:22px 26px;
+    margin:18px 0;
+    box-shadow:0 5px 14px rgba(0,0,0,.08);
+    border-left:8px solid #003B8E;
+}
+
+.total{
+    font-size:1.45rem;
+    font-weight:700;
+    margin:8px 0 14px;
+    color:#003B8E;
+}
+
+.rows{
+    display:grid;
+    gap:8px;
+}
+
+.row{
+    display:flex;
+    justify-content:space-between;
+    gap:12px;
+    border-bottom:1px solid #eee;
+    padding-bottom:6px;
+}
+
+.label{
+    color:#333;
+}
+
+.val{
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.meta{
+    color:#555;
+    font-size:.95rem;
+    margin:16px 0;
+}
+
+.badge{
+    display:inline-block;
+    background:#eef3fb;
+    color:#003B8E;
+    border-radius:999px;
+    padding:2px 10px;
+    font-size:.85rem;
+    margin-left:8px;
+    font-weight:bold;
+}
+
+.error{
+    background:#fff3f3;
+    border:1px solid #f5b5b5;
+    color:#b00020;
+    padding:12px;
+    border-radius:10px;
+    margin:12px 0;
+    white-space:pre-wrap;
+}
+
+@media(max-width:768px){
+    .container{
+        padding:30px 16px;
+    }
+
+    h1{
+        font-size:28px;
+    }
+
+    .card{
+        padding:18px;
+    }
+
+    .row{
+        font-size:15px;
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<header>
+  <h1>2026年度 学納金等一覧</h1>
+  <div class="hint">学校・所属・学年を選ぶと、その学年で必要となる学納金等の一覧が表示されます。</div>
+</header>
+
+<section class="controls">
+  <!-- 学校 -->
+  <select id="category">
+    <option value="">学校を選択してください</option>
+    <option value="grad">大学院</option>
+    <option value="univ">大学</option>
+    <option value="junior">短期大学部</option>
+  </select>
+
+  <!-- 所属（学校に応じて差し替え） -->
+  <select id="program" disabled>
+    <option value="">所属を選択してください</option>
+  </select>
+
+  <!-- 学年（学校/所属に応じて差し替え） -->
+  <select id="gakunen" disabled>
+    <option value="">学年を選択してください</option>
+  </select>
+</section>
+
+<div id="errorBox" class="error" style="display:none;"></div>
+<div id="result"></div>
+
+<script>
+(function () {
+  const errorBox = document.getElementById("errorBox");
+  function showError(msg) {
+    errorBox.style.display = "block";
+    errorBox.textContent = msg;
+  }
+
+  try {
+    // ==========
+    // データ
+    // ==========
+    const data = {
+      jissen: {
+        "1": {
+          zenki: {
+            title: "実践栄養学科 1年（前期）",
+            total: 1296500,
+            items: [
+              ["入学金", 275000],
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+              ["調理学実習費", 15500],
+              ["香友会費", 30000],
+              ["保護者会費", 10000],
+              ["学用品費", 115000]
+            ]
+          },
+          kouki: {
+            title: "実践栄養学科 1年（後期）",
+            total: 873000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+	      ["調理学実習費", 22000]
+            ]
+          },
+          annual: { title: "実践栄養学科 1年（前期＋後期）", total: 2169500 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7285500, note:"現時点での学納金等を基に算出した参考額です"  }
+        },
+        "2": {
+          zenki: {
+            title: "実践栄養学科 2年（前期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "実践栄養学科 2年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "実践栄養学科 2年（前期＋後期）", total: 1702000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7285500, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "3": {
+          zenki: {
+            title: "実践栄養学科 3年（前期）",
+            total: 861000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+	      ["保護者会費", 10000]
+            ]
+          },
+          kouki: {
+            title: "実践栄養学科 3年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "実践栄養学科 3年（前期＋後期）", total: 1712000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7285500, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "4": {
+          zenki: {
+            title: "実践栄養学科 4年（前期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "実践栄養学科 4年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "実践栄養学科 4年（前期＋後期）", total: 1702000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7285500, note:"現時点での学納金等を基に算出した参考額です"}
+        }
+      },
+
+      eiyo_ino: {
+        "1": {
+          zenki: {
+            title: "栄養イノベーション専攻 1年（前期）",
+            total: 1294900,
+            items: [
+              ["入学金", 275000],
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+              ["調理学実習費", 18900],
+              ["香友会費", 30000],
+              ["保護者会費", 10000],
+              ["学用品費", 110000]
+            ]
+          },
+          kouki: {
+            title: "栄養イノベーション専攻 1年（後期）",
+            total: 878100,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+	      ["調理学実習費", 27100]
+            ]
+          },
+          annual: { title: "栄養イノベーション専攻 1年（前期＋後期）", total: 2173000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7313200, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "2": {
+          zenki: {
+            title: "栄養イノベーション専攻 2年（前期）",
+            total: 875200,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+              ["調理学実習費", 24200]
+            ]
+          },
+          kouki: {
+            title: "栄養イノベーション専攻 2年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "栄養イノベーション専攻 2年（前期＋後期）", total: 1726200 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7313200, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "3": {
+          zenki: {
+            title: "栄養科学専攻 3年（前期）",
+            total: 861000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+	      ["保護者会費", 10000]
+            ]
+          },
+          kouki: {
+            title: "栄養科学専攻 3年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "栄養科学専攻 3年（前期＋後期）", total: 1712000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7313200, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "4": {
+          zenki: {
+            title: "栄養科学専攻 4年（前期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+            ]
+          },
+          kouki: {
+            title: "栄養科学専攻 4年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "栄養科学専攻 4年（前期＋後期）", total: 1702000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7313200, note:"現時点での学納金等を基に算出した参考額です"}
+        }
+    },
+
+      hoken: {
+        "1": {
+          zenki: {
+            title: "保健養護専攻 1年（前期）",
+            total: 1245000,
+            items: [
+              ["入学金", 275000],
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+              ["調理学実習費", 22000],
+              ["香友会費", 30000],
+              ["保護者会費", 10000],
+              ["学用品費", 57000]
+            ]
+          },
+          kouki: {
+            title: "保健養護専攻 1年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "保健養護専攻 1年（前期＋後期）", total: 2096000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7212000, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "2": {
+          zenki: {
+            title: "保健養護専攻 2年（前期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "保健養護専攻 2年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "保健養護専攻 2年（前期＋後期）", total: 1702000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7212000, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "3": {
+          zenki: {
+            title: "保健養護専攻 3年（前期）",
+            total: 861000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000],
+	      ["保護者会費", 10000]
+            ]
+          },
+          kouki: {
+            title: "保健養護専攻 3年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "保健養護専攻 3年（前期＋後期）", total: 1712000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7212000, note:"現時点での学納金等を基に算出した参考額です"}
+        },
+        "4": {
+          zenki: {
+            title: "保健養護専攻 4年（前期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "保健養護専攻 4年（後期）",
+            total: 851000,
+            items: [
+              ["授業料", 440000],
+              ["実験実習教育研究費", 140000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "保健養護専攻 4年（前期＋後期）", total: 1702000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 7212000, note:"現時点での学納金等を基に算出した参考額です"}
+        }
+     },
+
+      syokubunka: {
+        "1": {
+          zenki: {
+            title: "食文化栄養学科 1年（前期）",
+            total: 1226700,
+            items: [
+              ["入学金", 261000],
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000],
+              ["調理学実習費", 17200],
+              ["香友会費", 30000],
+              ["保護者会費", 10000],
+              ["学用品費", 100000]
+            ]
+          },
+          kouki: {
+            title: "食文化栄養学科 1年（後期）",
+            total: 832200,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000],
+	      ["調理学実習費", 23700]
+            ]
+          },
+          annual: { title: "食文化栄養学科 1年（前期＋後期）", total: 2058900 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 6919900, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "2": {
+          zenki: {
+            title: "食文化栄養学科 2年（前期）",
+            total: 808500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "食文化栄養学科 2年（後期）",
+            total: 808500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "食文化栄養学科 2年（前期＋後期）", total: 1617000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 6919900, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "3": {
+          zenki: {
+            title: "食文化栄養学科 3年（前期）",
+            total: 818500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000],
+	      ["保護者会費", 10000]
+            ]
+          },
+          kouki: {
+            title: "食文化栄養学科 3年（後期）",
+            total: 808500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "食文化栄養学科 3年（前期＋後期）", total: 1627000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 6919900, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "4": {
+          zenki: {
+            title: "食文化栄養学科 4年（前期）",
+            total: 808500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000]
+            ]
+          },
+          kouki: {
+            title: "食文化栄養学科 4年（後期）",
+            total: 808500,
+            items: [
+              ["授業料", 408500],
+              ["実験実習教育研究費", 129000],
+              ["施設費", 271000]
+            ]
+          },
+          annual: { title: "食文化栄養学科 4年（前期＋後期）", total: 1617000 },
+          annual_total: { title: "【参考】在学期間の総額（4年間）", total: 6919900, note:"現時点での学納金等を基に算出した参考額です" }
+        }
+      },
+
+      tandai: {
+        "1": {
+          zenki: {
+            title: "食物栄養学科 1年（前期）",
+            total: 1130400,
+            items: [
+              ["入学金", 260000],
+              ["授業料", 377000],
+              ["実験実習教育研究費", 133000],
+              ["施設費", 179500],
+              ["調理学実習費", 25900],
+              ["香友会費", 30000],
+              ["保護者会費", 5000],
+              ["学用品費", 120000]
+            ]
+          },
+          kouki: {
+            title: "食物栄養学科 1年（後期）",
+            total: 713400,
+            items: [
+              ["授業料", 377000],
+              ["実験実習教育研究費", 133000],
+              ["施設費", 179500],
+              ["調理学実習費", 23900]
+            ]
+          },
+          annual: { title: "食物栄養学科 1年（前期＋後期）", total: 1843800 },
+          annual_total: { title: "【参考】在学期間の総額（2年間）", total: 3254900, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "2": {
+          zenki: {
+            title: "食物栄養学科 2年（前期）",
+            total: 721600,
+            items: [
+              ["授業料", 377000],
+              ["実験実習教育研究費", 133000],
+              ["施設費", 179500],
+              ["調理学実習費", 27100],
+              ["保護者会費", 5000]
+            ]
+          },
+          kouki: {
+            title: "食物栄養学科 2年（後期）",
+            total: 689500,
+            items: [
+              ["授業料", 377000],
+              ["実験実習教育研究費", 133000],
+              ["施設費", 179500]
+            ]
+          },
+          annual: { title: "食物栄養学科 2年（前期＋後期）", total: 1411100 },
+          annual_total: { title: "【参考】在学期間の総額（2年間）", total: 3254900, note:"現時点での学納金等を基に算出した参考額です" }
+        }
+      },
+
+      syushi: {
+        "1": {
+          zenki: {
+            title: "修士課程 1年（前期）",
+            total: 766000,
+            items: [
+              ["入学金", 200000],
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500],
+              ["香友会費", 30000]
+            ]
+          },
+          kouki: {
+            title: "修士課程 1年（後期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          annual: { title: "修士課程 1年（前期＋後期）", total: 1302000 },
+          annual_total: { title: "【参考】在学期間の総額（2年間）", total: 2374000, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "2": {
+          zenki: {
+            title: "修士課程 2年（前期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          kouki: {
+            title: "修士課程 2年（後期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          annual: { title: "修士課程 2年（前期＋後期）", total: 1072000 },
+          annual_total: { title: "【参考】在学期間の総額（2年間）", total: 2374000, note:"現時点での学納金等を基に算出した参考額です" }
+        }
+      },
+
+      hakase: {
+        "1": {
+          zenki: {
+            title: "博士後期課程 1年（前期）",
+            total: 766000,
+            items: [
+              ["入学金", 200000],
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500],
+              ["香友会費", 30000]
+            ]
+          },
+          kouki: {
+            title: "博士後期課程 1年（後期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          annual: { title: "博士後期課程 1年（前期＋後期）", total: 1302000 },
+          annual_total: { title: "【参考】在学期間の総額（3年間）", total: 3446000, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "2": {
+          zenki: {
+            title: "博士後期課程 2年（前期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          kouki: {
+            title: "博士後期課程 2年（後期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          annual: { title: "博士後期課程 2年（前期＋後期）", total: 1072000 },
+          annual_total: { title: "【参考】在学期間の総額（3年間）", total: 3446000, note:"現時点での学納金等を基に算出した参考額です" }
+        },
+        "3": {
+          zenki: {
+            title: "博士後期課程 3年（前期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          kouki: {
+            title: "博士後期課程 3年（後期）",
+            total: 536000,
+            items: [
+              ["授業料", 264000],
+              ["実験実習教育研究費", 260500],
+              ["施設費", 11500]
+            ]
+          },
+          annual: { title: "博士後期課程 3年（前期＋後期）", total: 1072000 },
+          annual_total: { title: "【参考】在学期間の総額（3年間）", total: 3446000, note:"現時点での学納金等を基に算出した参考額です" }
+        }
+      },
+
+    };
+
+    // ==========
+    // 区分 → 所属（表示する選択肢）
+    // ==========
+    const programsByCategory = {
+      grad: [
+        { value: "syushi", label: "修士課程" },
+        { value: "hakase", label: "博士後期課程" }
+      ],
+      univ: [
+        { value: "jissen", label: "実践栄養学科" },
+        { value: "eiyo_ino", label: "栄養科学専攻・栄養イノベーション専攻" },
+        { value: "hoken", label: "保健養護専攻" },
+        { value: "syokubunka", label: "食文化栄養学科" }
+      ],
+      junior: [
+        { value: "tandai", label: "食物栄養学科" }
+      ]
+    };
+
+    // ==========
+    // 学年ルール
+    // ==========
+    const gradesRule = {
+      grad: {
+        syushi: [1, 2],
+        hakase: [1, 2, 3]
+      },
+      univ: [1, 2, 3, 4],
+      junior: [1, 2]
+    };
+
+    const yen = n => (n ?? 0).toLocaleString("ja-JP") + "円";
+    const category = document.getElementById("category");
+    const program = document.getElementById("program");
+    const gakunen = document.getElementById("gakunen");
+    const result = document.getElementById("result");
+
+    function makeCard(d) {
+      if (!d) return "";
+      const rows = (d.items || []).map(([k, v]) => `
+        <div class="row">
+          <div class="label">${k}</div>
+          <div class="val">${yen(v)}</div>
+        </div>
+      `).join("");
+
+      return `
+        <div class="card">
+          <div><strong>${d.title}</strong><span class="badge">内訳</span></div>
+          <div class="total">合計：${yen(d.total)}</div>
+          <div class="rows">${rows}</div>
+        </div>
+      `;
+    }
+
+   function makeAnnualCard(d, label) {
+     if (!d) return "";
+     const noteHtml = d.note ? `<div class="meta">${d.note}</div>` : "";
+   return `
+     <div class="card">
+       <div><strong>${d.title}</strong><span class="badge">${label}</span></div>
+       <div class="total">合計：${yen(d.total)}</div>
+      ${noteHtml}
+    </div>
+  `;
+   }
+
+    function render() {
+      const p = program.value;
+      const g = gakunen.value;
+
+      result.innerHTML = "";
+      errorBox.style.display = "none";
+
+      if (!p || !g) return;
+
+      const rec = (data[p] && data[p][g]) ? data[p][g] : null;
+      if (!rec) {
+        result.innerHTML = `<div class="card">この学科・学年のデータは未入力です。</div>`;
+        return;
+      }
+
+      result.innerHTML = `
+        ${makeCard(rec.zenki)}
+        ${makeCard(rec.kouki)}
+        ${makeAnnualCard(rec.annual, "年額")}
+        ${makeAnnualCard(rec.annual_total, "総額(目安)")}
+
+        <p class="meta">
+          資格取得等のために特別に必要となる経費は別途徴収いたします。<br>
+          翌年以降の学納金等については、社会経済情勢等、学内外の諸般の要因を参考に決定します。
+        </p>
+      `;
+    }
+
+    function resetProgram() {
+      program.innerHTML = `<option value="">所属を選択してください</option>`;
+      program.disabled = true;
+      program.value = "";
+    }
+
+    function resetGrades() {
+      gakunen.innerHTML = `<option value="">学年を選択してください</option>`;
+      gakunen.disabled = true;
+      gakunen.value = "";
+    }
+
+    function rebuildProgramOptions() {
+      resetProgram();
+      const list = programsByCategory[category.value];
+      if (!list) return;
+
+      list.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p.value;
+        opt.textContent = p.label;
+        program.appendChild(opt);
+      });
+      program.disabled = false;
+    }
+
+    function getAllowedGrades(cat, prog) {
+      if (!cat || !prog) return [];
+
+      if (cat === "grad") {
+        const map = gradesRule.grad;
+        return (map && map[prog]) ? map[prog] : [];
+      }
+
+      if (cat === "vocational") {
+        const map = gradesRule.vocational;
+        return (map && map[prog]) ? map[prog] : [];
+      }
+
+      return gradesRule[cat] || [];
+    }
+
+    function rebuildGradeOptions() {
+      resetGrades();
+      result.innerHTML = "";
+      errorBox.style.display = "none";
+
+      const cat = category.value;
+      const prog = program.value;
+      const allowed = getAllowedGrades(cat, prog);
+
+      if (!allowed.length) return;
+
+      allowed.forEach(v => {
+        const opt = document.createElement("option");
+        opt.value = String(v);
+        opt.textContent = `${v}年`;
+        gakunen.appendChild(opt);
+      });
+
+      gakunen.disabled = false;
+    }
+
+    // ==========
+    // イベント
+    // ==========
+    category.addEventListener("change", () => {
+      result.innerHTML = "";
+      errorBox.style.display = "none";
+      rebuildProgramOptions();
+      resetGrades();
+    });
+
+    program.addEventListener("change", () => {
+      rebuildGradeOptions();
+      render();
+    });
+
+    gakunen.addEventListener("change", render);
+
+    // 初期化
+    resetProgram();
+    resetGrades();
+    render();
+
+  } catch (e) {
+    showError("ページの中でエラーが起きました。\n\n" + (e && e.stack ? e.stack : e));
+  }
+})();
+</script>
+
+</div>
+
+</body>
+</html>
